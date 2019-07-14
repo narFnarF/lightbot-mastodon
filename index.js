@@ -43,6 +43,7 @@ listener.on('heartbeat', (msg)=>{
 
 console.log("Start!");
 
+cheat();
 
 
 
@@ -90,7 +91,7 @@ function lightCommand(args, event) {
 	var level = 1;
 	var myFilePath = `light ${event.data.account.acct} ${event.data.account.id} ${Date.now()}.png`;
 	var size = level+1;
-	var pic = new LightPicture(size, myFilePath, async (err, res)=>{ // TODO: Promisify this?
+	var pic = new LightPicture(size, myFilePath, async (err, res)=>{ 
 		if (!err) {
 			replyWithAttachment("hellol. this is a placeholder light show.", event, myFilePath);
 			fs.rename(res.path, "previous light.png", (err)=>{
