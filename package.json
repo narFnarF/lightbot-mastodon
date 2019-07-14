@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "author": "narF (http://narF.ca)",
   "dependencies": {
+    "lightbot-util": "git+https://git@github.com/narFnarF/lightbot-util.git",
     "mastodon-api": "^1.3.0",
     "striptags": "^3.1.1"
   },
@@ -12,5 +13,18 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/narFnarF/lightbot-mastodon.git"
+  },
+  "keywords": [
+    "Lightbot",
+    "narF",
+    "Lightgame"
+  ],
+  "bugs": {
+    "url": "https://github.com/narFnarF/lightbot-mastodon/issues"
+  },
+  "homepage": "https://github.com/narFnarF/lightbot-mastodon#readme",
   "license": "ISC"
 }

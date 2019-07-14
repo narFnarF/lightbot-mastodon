@@ -1,7 +1,10 @@
+"use strict";
+
 const Mastodon = require('mastodon-api');
 const Masto = new Mastodon(require('./config.js'));
 const striptags = require('striptags');
 const fs = require('fs');
+const LightPicture = require('lightbot-util');
 
 const listener = Masto.stream('streaming/user');
 
@@ -39,7 +42,6 @@ listener.on('heartbeat', (msg)=>{
 })
 
 console.log("Start!");
-
 
 
 
@@ -83,7 +85,20 @@ function testCommand(args, event) {
 
 function lightCommand(args, event) {
 	console.log("C'était pour un light!");
-	replyWithAttachment("this is a fake light show. Sorry, not sorry.", event, "previous light.png");
+	
+
+	var level = 1;
+	var myFilePath = `light ${event.data.account.acct} ${event.data.account.id} ${Date.now()}.png`;
+	var size = level+1;
+	var pic = new LightPicture(size, myFilePath, async (err, res)=>{ // TODO: Promisify this?
+		if (!err) {
+			replyWithAttachment("hellol. this is a placeholder light show.", event, myFilePath);
+			fs.rename(res.path, "previous light.png", (err)=>{
+				// logger.debug(`rename`);
+				if ( err ) logger.warn(`Could not rename the screenshot ${res.path}: ${err}`);
+			});
+		}
+	});
 }
 
 function unknownCommand(args, event) {
@@ -125,4 +140,10 @@ async function replyWithAttachment(text, event, filepath) {
 			}
 		});
 	});
+}
+
+function cheat() {
+	var txtJsonEvent = fs.readFileSync("./logs/notifMention.json"); // Read the file on disk
+	var event = JSON.parse(txtJsonEvent);
+	lightCommand([], event);
 }
