@@ -4,7 +4,7 @@ const Mastodon = require('mastodon-api');
 const Masto = new Mastodon(require('./config.js'));
 const striptags = require('striptags');
 const fs = require('fs');
-const LightPicture = require('lightbot-util');
+const LightPicture = require('lightbot-util').LightPicture;
 
 const listener = Masto.stream('streaming/user');
 
