@@ -1,6 +1,6 @@
 node_modules/
-.vscode/
-config.js
 logs/
+
 previous light.png
-to delete/
+config.js
+dbPlayers.json
