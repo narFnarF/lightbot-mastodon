@@ -5,6 +5,7 @@ const Masto = new Mastodon(require('./config.js'));
 const striptags = require('striptags');
 const fs = require('fs');
 const LightPicture = require('lightbot-util').LightPicture;
+const pm = require('./util/PlayerManager.js');
 
 const listener = Masto.stream('streaming/user');
 
@@ -41,9 +42,12 @@ listener.on('heartbeat', (msg)=>{
 	console.log(msg);
 })
 
-console.log("Start!");
 
-cheat();
+{
+	console.log("Start!");
+	pm.init("dbPlayers.json", "pas d'admin");
+	cheat();
+}
 
 
 
@@ -87,19 +91,39 @@ function testCommand(args, event) {
 function lightCommand(args, event) {
 	console.log("C'était pour un light!");
 	
+	const userID = event.data.account.id;
+	const username = event.data.account.acct;
+	const player = pm.getOrCreatePlayer(userID, username);
 
-	var level = 1;
-	var myFilePath = `light ${event.data.account.acct} ${event.data.account.id} ${Date.now()}.png`;
-	var size = level+1;
-	var pic = new LightPicture(size, myFilePath, async (err, res)=>{ 
-		if (!err) {
-			replyWithAttachment("hellol. this is a placeholder light show.", event, myFilePath);
-			fs.rename(res.path, "previous light.png", (err)=>{
-				// logger.debug(`rename`);
-				if ( err ) logger.warn(`Could not rename the screenshot ${res.path}: ${err}`);
-			});
-		}
-	});
+	if (player.allowedToPlay()) {
+
+		var level = player.level;
+		var myFilePath = `light ${event.data.account.acct} ${event.data.account.id} ${Date.now()}.png`;
+		var size = level+1;
+		var pic = new LightPicture(size, myFilePath, async (err, res)=>{
+			if (!err) {
+				if (!res.won) { // No level up.
+					replyWithAttachment(`Here's your light show. You are level ${level}. I wonder what your next image will look like...`, event, myFilePath);
+				} else { // Level up
+					player.increaseLevel();
+					replyWithAttachment(`Here's your light show. You are level ${level}. \n🎇 Enlighted! You've reached level ${level+1}. 🎇 I wonder what your next image will look like...`, event, myFilePath);
+				}
+				
+				fs.rename(res.path, "previous light.png", (err)=>{
+					// logger.debug(`rename`);
+					if ( err ) logger.warn(`Could not rename the screenshot ${res.path}: ${err}`);
+				});
+				player.updateLastPlayed();
+				// pm.writeDBFile();
+			}
+		});
+
+
+	} else { //Not allowed to play
+		replyToot(`You're not allowed to play.`, event);
+	}
+
+	
 }
 
 function unknownCommand(args, event) {
@@ -144,7 +168,7 @@ async function replyWithAttachment(text, event, filepath) {
 }
 
 function cheat() {
-	var txtJsonEvent = fs.readFileSync("./logs/notifMention.json"); // Read the file on disk
-	var event = JSON.parse(txtJsonEvent);
-	lightCommand([], event);
+	var txtJsonEvent = fs.readFileSync("./logs/notifMention.json"); // Read a copy of the last mention received
+	var event = JSON.parse(txtJsonEvent); // parse the json
+	lightCommand([], event); // mimic that the command in the mention was "light"
 }
