@@ -76,6 +76,9 @@ class PlayerManager {
 	async writeDBFile() {
 		//write the db in file
 
+		console.debug("Requested to save.");
+		this.checkIfInitialized();
+
 		if (!this.currentlyWriting) { // It is unsafe to use fs.writeFile() multiple times on the same file without waiting for the callback. https://nodejs.org/api/fs.html#fs_fs_writefile_file_data_options_callback
 			this.currentlyWriting = true;
 
@@ -84,7 +87,7 @@ class PlayerManager {
 			if (!beautifulPlayersDB) { // if the json string is empty for some reason
 				console.debug(`I'm about to write but beautifulPlayersDB is empty. Here's the object:`);
 				console.log(this.players);
-				throw `beautifulPlayersDB is empty!`;
+				throw new Error(`beautifulPlayersDB is empty!`);
 			}
 
 			// write the json file
@@ -112,13 +115,15 @@ class PlayerManager {
 	}
 
 	createPlayer(userID, name) {
+		this.checkIfInitialized();
+
 		if (this.exists(userID)) { // If it already exists
 			console.warn(`Trying to create a player that already exists: ${name} (${userID})`)
 			return this.players[userID];
 		} else {
 			var player = new Player(userID, name);
 			this.players[userID] = player;
-			// console.log(player);
+			
 			return player;
 		}
 	}
@@ -163,6 +168,15 @@ class PlayerManager {
 		}
 	}
 
+	forEachPlayer(callback) {
+		if (callback) {
+			Object.keys(this.players).forEach((id)=>{ // for each object in the player db
+				var player = this.players[id];
+				callback(id, player);
+			})
+		}
+	}
+
 	isAdmin(userID) {
 		// Returns true if the id is the same as the admin's id.
 		// usage: pm.isAdmin("1234567890")
@@ -177,22 +191,33 @@ class PlayerManager {
 	async levelUpPlayer(id) {
 		this.checkIfInitialized();
 
-		this.getPlayer(id).increaseLevel(); // do the level up
+		var level = this.getPlayer(id).increaseLevel(); // do the level up
 		await this.writeDBFile();
+		return level;
+	}
+
+	async increaseAttempts(userID) {
+		this.checkIfInitialized();
+
+		var attempts = this.getPlayer(userID).increaseAttempts();
+		await this.writeDBFile();
+		return attempts;
 	}
 
 	async relight(id) {
 		this.checkIfInitialized();
 
-		this.getPlayer(id).increaseRelightCount();
+		var data = this.getPlayer(id).increaseRelightCount();
 		await this.writeDBFile();
+		return data; //format: { level: this.level,   relight: this.relight };
 	}
 
 	async updateLastPlayed(id) {
 		this.checkIfInitialized();
 
-		this.getPlayer(id).updateLastPlayed();
+		var lastPlayed = this.getPlayer(id).updateLastPlayed();
 		await this.writeDBFile();
+		return lastPlayed;
 	}
 
 	async exit() {

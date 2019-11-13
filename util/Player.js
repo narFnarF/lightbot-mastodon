@@ -20,8 +20,9 @@ class Player {
          this.name = name;
          this.level = 1;
          this.lastPlayed = 0;
-         this.waiting = false;
+         this.waiting = false; // TODO: Add a value to store the time
          this.attempts = 0;
+         this.event = undefined;
 
       } else if (arguments.length == 1) { // receives a fake Player and transforms it into a real Player.
          // logger.debug(`Player constructor with just 1 obj param: ${obj}`);
@@ -31,7 +32,8 @@ class Player {
          this.lastPlayed = obj.lastPlayed;
          this.relight = obj.relight;
          this.waiting = obj.waiting;
-         this.attempt = obj.attempts;
+         this.attempts = obj.attempts;
+         this.event = obj.event;
       }
       // logger.debug(`Created a new Player:`);
       // console.log(this);
@@ -50,8 +52,18 @@ class Player {
 
    setEndLevelForAllPlayers(lv) {Player.endLevel = lv; }
 
+   
+   increaseAttempts() {
+      if (!this.attempts) {
+         this.attempts = 0;
+      }
+      this.attempts++;
+      return this.attempts;
+   }
+   
    increaseLevel() {
       this.level++;
+      return this.level;
    }
 
    increaseRelightCount() {
@@ -61,16 +73,28 @@ class Player {
          this.relight++;
       }
       this.level = 1;
+
+      return { level: this.level,   relight: this.relight };
    }
 
-   allowedToPlay() {
-      // Returns true if the player hasn't played in the last 5 minutes
-      var canPlay = Date.now() > this.lastPlayed + (5*60*1000); //5 minutes, in ms
+   waitedEnough() {
+      // Returns true if the player hasn't played recently
+      
+      var delay = 3*60*60*1000; // 3 hours
+      // var delay = 30*1000; // 30 seconds // CHEAT
+      var canPlay = Date.now() > this.lastPlayed + delay;
       return canPlay;
    }
 
+   // readyToSendPicture() {
+   //    // Returns true if the player has waited long enough and we can send his picture
+   //    var canSend = Date.now() > this.lastPlayed + ;
+   //    return canSend;
+   // }
+
    updateLastPlayed() {
       this.lastPlayed = Date.now();
+      return this.lastPlayed;
    }
 
    get displayLevel() {
