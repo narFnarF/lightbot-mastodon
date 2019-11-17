@@ -37,7 +37,7 @@ listener.on('message', event => {
 			var cleanedMessage = extractMsgFromEvent(event);
 			
 			console.log(`Reçu une mention qui disait: ${cleanedMessage}`);
-			saveToFile("logs/notifMention.json", event);
+			saveToFileAsJSON("logs/notifMention.json", event);
 
 			// replyToot(`Time:${event.data.created_at} Salut @${event.data.account.acct}. Merci pour ton message qui disait: ${cleanedMessage}`, event);
 
@@ -74,8 +74,18 @@ function parseCommands(msg) {
 	return commands;
 }
 
-function saveToFile(filepath, object) {
-	fs.writeFileSync(filepath, JSON.stringify(object, null, 4));
+function saveToFileAsJSON(filepath, object) {
+	if (!fs.existsSync("logs/")) { //creates the logs folder if it doesn't exist
+		fs.mkdirSync("logs/");
+	}
+
+	try {
+		fs.writeFileSync(filepath, JSON.stringify(object, null, 4));
+		console.log(`Saved file ${filepath}.`)
+	} catch (error) {
+		console.error(`I could not save the file to ${filepath}.`);
+		console.log(error);
+	}
 }
 
 function callCommand(command, args, event) {
@@ -178,7 +188,7 @@ function sendPictures() {
 			
 			
 			// errors?
-		} else if (!player.waiting && player.event) {
+		} else if (!player.waiting && player.event) { //I don't know what this part of the code does... :(
 			player.event = undefined;
 			requireSaving = true;
 		}
@@ -200,7 +210,7 @@ async function replyToot(text, event) {
 	}, (err, res)=>{
 		if (!err) {
 			console.log(`${res.created_at}  Post success. Message:"${striptags(res.content)}"    Id:${res.id} `);
-			saveToFile("logs/postReply.json", res);
+			saveToFileAsJSON("logs/postReply.json", res);
 			return res;
 		} else {
 			console.error(err);
@@ -221,7 +231,7 @@ async function replyWithAttachment(text, event, filepath) {
 		}, (err, res)=>{
 			if (!err) {
 				console.log(`${res.created_at}  Post success. Message:"${striptags(res.content)}"    Id:${res.id} `);
-				saveToFile("logs/postReply.json", res);
+				saveToFileAsJSON("logs/postReply.json", res);
 				return res;
 			} else {
 				console.error(err);
