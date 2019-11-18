@@ -210,8 +210,8 @@ function sendPictures() {
 
 
 			// errors?
-		} else if (!player.waiting && player.event) { //I don't know what this part of the code does... :(
-			player.event = undefined;
+		} else if (!player.waiting && player.event) { //if the player is not waiting
+			player.event = undefined; //remove its event data (to keep the DB clean)
 			requireSaving = true;
 		}
 	});
