@@ -45,6 +45,7 @@ listener.on('message', event => {
 			console.log(`Commands:${commands}`);
 
 			var command = commands.shift();
+			command = command.replace(/[^A-Za-z0-9_]/g,""); //remove punctuation and special characters from the command (to cleanup stuff like "light." with a punctuation at the end)
 			var args = commands;
 			callCommand(command, args, event);
 		}
