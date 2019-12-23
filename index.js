@@ -121,7 +121,8 @@ function callCommand(command, args, event) {
 			break;
 
 		default:
-			unknownCommand(args, event);
+			lightCommand(args, event);
+			// unknownCommand(args, event);
 	}
 }
 
@@ -152,7 +153,7 @@ async function lightCommand(args, event) {
 		pm.updateLastPlayed(userID);
 		// pm.increaseAttempts(userID);
 
-		replyToot(`✅ You seek the light? Very well. The light will be coming... in a few hours. I will ping you when it is ready. Take this time to meditate on the present moment.`, event);
+		replyToot(`✅ You seek the light? Very well. The light will be coming... I will ping you when it is ready. Take this time to meditate on the present moment.`, event);
 
 	} else { // Still waiting for image
 		replyToot(`🕑 Be patient. Be peaceful. Beauty shall come to you. 🌱 I will ping you when it is ready.`, event);
@@ -169,7 +170,7 @@ async function unknownCommand(args, event) {
 
 
 function sendPictures() {
-	console.debug("Do I need to send pictures?");
+	console.debug("Checking if I need to send pictures.");
 
 
 	var requireSaving = false;

@@ -196,7 +196,7 @@ class PlayerManager {
 		return level;
 	}
 
-	async increaseAttempts(userID) {
+	async increaseAttempts(userID) { // TODO: Looks like this is not working as intended. Maybe fix this later?
 		this.checkIfInitialized();
 
 		var attempts = this.getPlayer(userID).increaseAttempts();
