@@ -31,11 +31,11 @@ listener.on('message', event => {
 	console.log(`Reçu un event de stream: ${event.event}.`)
 	if (event.event === 'notification') {
 		console.log(`C'est un "${event.data.type}"`);
-		
+
 		if (event.data.type === 'mention') {
 			// var message = cleanupMsg(msg.data.status.content, msg.data.status.mentions[0].acct);
 			var cleanedMessage = extractMsgFromEvent(event);
-			
+
 			console.log(`Reçu une mention qui disait: ${cleanedMessage}`);
 			saveToFileAsJSON("logs/notifMention.json", event);
 
@@ -45,19 +45,41 @@ listener.on('message', event => {
 			console.log(`Commands:${commands}`);
 
 			var command = commands.shift();
+			command = command.replace(/[^A-Za-z0-9_]/g,""); //remove punctuation and special characters from the command (to cleanup stuff like "light." with a punctuation at the end)
 			var args = commands;
 			callCommand(command, args, event);
 		}
 	}
 });
 
+listener.on('connected', msg=>{
+	// console.log("connected!");
+	// console.log(msg);
+	console.log(`I'm connected to ${msg.request.href}`);
+	saveToFileAsJSON("logs/connected.json", msg);
+});
+
+listener.on('reconnect', msg=>{
+	console.log("reconnect!");
+	console.log(msg);
+	saveToFileAsJSON("logs/reconnect.json", msg);
+});
+
+listener.on('disconnect', msg=>{
+	console.log("disconnect!");
+	console.log(msg);
+	saveToFileAsJSON("logs/disconnect.json", msg);
+});
+
 listener.on('error', (err)=>{
 	console.error(err);
+	saveToFileAsJSON("logs/error.json", err);
 });
 
 listener.on('heartbeat', (msg)=>{
 	console.log('Heartbeat signal. Thump thump!');
 	console.log(msg);
+	saveToFileAsJSON("logs/heartbeat.json", msg);
 })
 
 
@@ -99,7 +121,8 @@ function callCommand(command, args, event) {
 			break;
 
 		default:
-			unknownCommand(args, event);
+			lightCommand(args, event);
+			// unknownCommand(args, event);
 	}
 }
 
@@ -110,7 +133,7 @@ function testCommand(args, event) {
 
 async function lightCommand(args, event) {
 	console.log("C'était pour un light!");
-	
+
 	const userID = event.data.account.id;
 	const username = event.data.account.acct;
 	const player = pm.getOrCreatePlayer(userID, username);
@@ -130,13 +153,13 @@ async function lightCommand(args, event) {
 		pm.updateLastPlayed(userID);
 		// pm.increaseAttempts(userID);
 
-		replyToot(`✅ You seek the light? Very well. The light will be coming... in a few hours. I will ping you when it is ready. Take this time to meditate on the present moment.`, event);
+		replyToot(`✅ You seek the light? Very well. The light will be coming... I will ping you when it is ready. Take this time to meditate on the present moment.`, event);
 
 	} else { // Still waiting for image
 		replyToot(`🕑 Be patient. Be peaceful. Beauty shall come to you. 🌱 I will ping you when it is ready.`, event);
 	}
 
-	
+
 }
 
 async function unknownCommand(args, event) {
@@ -147,16 +170,16 @@ async function unknownCommand(args, event) {
 
 
 function sendPictures() {
-	console.debug("Do I need to send pictures?");
+	console.debug("Checking if I need to send pictures.");
 
-	
+
 	var requireSaving = false;
 
 	pm.forEachPlayer( (id, player)=>{ // For each Player in the db
 		if (player.waiting && player.waitedEnough()) { // if the player is waiting and has waited enough
 			console.log("I should send a picture now!");
 			console.log(id, player);
-			
+
 
 			var event = player.event;
 
@@ -172,7 +195,7 @@ function sendPictures() {
 						await replyWithAttachment(`Here's your light show. You are level ${level}. \n🎇 Enlighted! You've reached level ${level+1}. 🎇 I wonder what your next image will look like...`, event, myFilePath);
 						var newLevel = pm.levelUpPlayer(id);
 					}
-					
+
 					fs.rename(res.path, "previous light.png", (err2)=>{
 						if ( err2 ) logger.warn(`Could not rename the screenshot ${res.path}: ${err2}`);
 					});
@@ -180,16 +203,16 @@ function sendPictures() {
 					player.waiting = false;
 					// pm.updateLastPlayed(id);
 					pm.increaseAttempts(id);
-					
+
 					pm.writeDBFile();
 				}
 			});
 
-			
-			
+
+
 			// errors?
-		} else if (!player.waiting && player.event) { //I don't know what this part of the code does... :(
-			player.event = undefined;
+		} else if (!player.waiting && player.event) { //if the player is not waiting
+			player.event = undefined; //remove its event data (to keep the DB clean)
 			requireSaving = true;
 		}
 	});
