@@ -128,6 +128,7 @@ function callCommand(command, args, event) {
 
 function testCommand(args, event) {
 	console.log("c'était pour un test.");
+	sleep(1000);
 	replyToot("Tu m'as envoyé un test!", event);
 }
 
@@ -156,6 +157,7 @@ async function lightCommand(args, event) {
 		replyToot(`✅ You seek the light? Very well. The light will be coming... I will ping you when it is ready. Take this time to meditate on the present moment.`, event);
 
 	} else { // Still waiting for image
+		await player.waitAndSetRateLimit()
 		replyToot(`🕑 Be patient. Be peaceful. Beauty shall come to you. 🌱 I will ping you when it is ready.`, event);
 	}
 
@@ -268,4 +270,8 @@ function cheat() {
 	var txtJsonEvent = fs.readFileSync("./logs/notifMention.json"); // Read a copy of the last mention received
 	var event = JSON.parse(txtJsonEvent); // parse the json
 	lightCommand([], event); // mimic that the command in the mention was "light"
+}
+
+async function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
 }

@@ -34,6 +34,7 @@ class Player {
          this.waiting = obj.waiting;
          this.attempts = obj.attempts;
          this.event = obj.event;
+         this.delay = obj.delay;
       }
       // logger.debug(`Created a new Player:`);
       // console.log(this);
@@ -50,7 +51,7 @@ class Player {
    get endLevel() {return Player.endLevel;}
    set endLevel(lv) {throw new Error("Can't set endLevel in an instance of Player.");}
 
-   setEndLevelForAllPlayers(lv) {Player.endLevel = lv; }
+   setEndLevelForAllPlayers(lv) {Player.endLevel = lv; } // TODO : Is this used??
 
    
    increaseAttempts() {
@@ -103,7 +104,35 @@ class Player {
       } else {
          return this.level;
       }
+   }
 
+   get delay() {
+      if (this.delay) {
+         return this.delay;
+      } else {
+         return 0;
+      }
+   }
+
+   increaseDelay() {
+      if (this.delay) {
+         this.delay += 10;
+      } else {
+         this.delay = 2;
+      }
+   }
+
+   async waitAndSetRateLimit() {
+      this.increaseDelay;
+      if (this.delay < 100) {
+         await sleep(max(this.delay-10, 0));
+      } else {
+         throw new error("bouette"); //pas sûr de la syntaxe de ça
+      }
    }
 }
 module.exports = Player;
+
+async function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
