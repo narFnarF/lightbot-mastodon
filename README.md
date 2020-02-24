@@ -11,7 +11,9 @@ A small game rewarding patience.
 
 ### Play
 
-*TODO: Add link to the bot here*
+Lightbot's profile: https://botsin.space/@lightbot
+
+Send a toot to the bot: `@lightbot@botsin.space`
 
 
 
