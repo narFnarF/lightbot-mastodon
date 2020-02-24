@@ -18,8 +18,8 @@ pm.init("dbPlayers.json", "pas d'admin");
 // cheat();
 
 
-// var interval = 1*60*1000; // 1 minute
-var interval = 10*1000; // 10 seconds // CHEAT
+var interval = 15*60*1000; // 15 minutes
+// var interval = 10*1000; // 10 seconds // CHEAT
 setInterval(()=>{
 	sendPictures();
 }, interval);
