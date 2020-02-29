@@ -81,8 +81,8 @@ class Player {
    waitedEnough() {
       // Returns true if the player hasn't played recently
       
-      // var delay = 3*60*60*1000; // 3 hours
-      var delay = 30*1000; // 30 seconds // CHEAT
+      var delay = 3*60*60*1000; // 3 hours
+      // var delay = 30*1000; // 30 seconds // CHEAT
       var canPlay = Date.now() > this.lastPlayed + delay;
       return canPlay;
    }
