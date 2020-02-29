@@ -81,8 +81,8 @@ class Player {
    waitedEnough() {
       // Returns true if the player hasn't played recently
       
-      var delay = 3*60*60*1000; // 3 hours
-      // var delay = 30*1000; // 30 seconds // CHEAT
+      // var delay = 3*60*60*1000; // 3 hours
+      var delay = 30*1000; // 30 seconds // CHEAT
       var canPlay = Date.now() > this.lastPlayed + delay;
       return canPlay;
    }
@@ -106,33 +106,34 @@ class Player {
       }
    }
 
-   get delay() {
-      if (this.delay) {
-         return this.delay;
-      } else {
-         return 0;
-      }
-   }
-
    increaseDelay() {
       if (this.delay) {
          this.delay += 10;
+         console.debug(`this.delay existed and now has a value of ${this.delay}`);
       } else {
          this.delay = 2;
+         console.debug(`this.delay didn't exist and now has a value of ${this.delay}`);
       }
    }
 
    async waitAndSetRateLimit() {
-      this.increaseDelay;
+      this.increaseDelay();
       if (this.delay < 100) {
-         await sleep(max(this.delay-10, 0));
+         var sleepDuration = Math.max(this.delay-10, 0) * 1000;
+         await sleep(sleepDuration);
       } else {
-         throw new error("bouette"); //pas sûr de la syntaxe de ça
+         throw new Error("Rate-limited");
       }
+   }
+
+   clearRateLimit() {
+      this.delay = undefined;
    }
 }
 module.exports = Player;
 
 async function sleep(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
+   console.debug(`sleeping for ${ms}ms or ${ms/1000}seconds.`);
+   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
