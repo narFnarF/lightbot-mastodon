@@ -1,5 +1,5 @@
 "use strict";
-// const logger = require("./logger.js");
+const config = require('../config.js');
 
 // Class variables
 var _endLevel;
@@ -81,7 +81,8 @@ class Player {
    waitedEnough() {
       // Returns true if the player hasn't played recently
       
-      var delay = 3*60*60*1000; // 3 hours
+      var delay = config.waitTime.minimum; 
+      // var delay = 3*60*60*1000; // 3 hours
       // var delay = 30*1000; // 30 seconds // CHEAT
       var canPlay = Date.now() > this.lastPlayed + delay;
       return canPlay;
@@ -108,7 +109,7 @@ class Player {
 
    increaseDelay() {
       if (this.delay) {
-         this.delay += 10;
+         this.delay += config.rateLimiter.extraTimePerRequest;
          console.debug(`this.delay existed and now has a value of ${this.delay}`);
       } else {
          this.delay = 2;
@@ -118,7 +119,7 @@ class Player {
 
    async waitAndSetRateLimit() {
       this.increaseDelay();
-      if (this.delay < 100) {
+      if (this.delay < config.rateLimiter.ignoreRequestsThreshold) {
          var sleepDuration = Math.max(this.delay-10, 0) * 1000;
          await sleep(sleepDuration);
       } else {

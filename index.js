@@ -1,7 +1,8 @@
 "use strict";
 
+const config = require('./config.js');
 const Mastodon = require('mastodon-api');
-const Masto = new Mastodon(require('./config.js'));
+const Masto = new Mastodon(config);
 const striptags = require('striptags');
 const fs = require('fs');
 const LightPicture = require('lightbot-util').LightPicture;
@@ -16,14 +17,17 @@ const listener = Masto.stream('streaming/user');
 console.log("Start!");
 console.log(`Connected to ${Masto.apiUrl}`)
 pm.init("dbPlayers.json", "pas d'admin");
-// cheat_lightReusingLastMention();
+
+// Cheat
+if (config.cheats.useCachedMention) {
+	cheat_lightReusingLastMention();
+}
 
 
-var interval = 15*60*1000; // 15 minutes
-// var interval = 10*1000; // 10 seconds // CHEAT
+// Setup a loop. Every X minutes, the bot checks if pictures needs to be sent, and sends them.
 setInterval(()=>{
 	sendPictures();
-}, interval);
+}, config.sendPicturesFrequency);
 
 
 
@@ -34,13 +38,10 @@ listener.on('message', event => {
 		console.log(`C'est un "${event.data.type}"`);
 
 		if (event.data.type === 'mention') {
-			// var message = cleanupMsg(msg.data.status.content, msg.data.status.mentions[0].acct);
 			var cleanedMessage = extractMsgFromEvent(event);
 
 			console.log(`Reçu une mention qui disait: ${cleanedMessage}`);
 			saveToFileAsJSON("logs/notifMention.json", event);
-
-			// replyToot(`Time:${event.data.created_at} Salut @${event.data.account.acct}. Merci pour ton message qui disait: ${cleanedMessage}`, event);
 
 			var commands = parseCommands(event);
 			console.log(`Commands:${commands}`);
@@ -57,30 +58,40 @@ listener.on('connected', msg=>{
 	// console.log("connected!");
 	// console.log(msg);
 	console.log(`I'm connected to ${msg.request.href}`);
-	saveToFileAsJSON("logs/connected.json", msg);
+	if (config.cheats.cacheCalls) {
+		saveToFileAsJSON("logs/connected.json", msg);
+	}
 });
 
 listener.on('reconnect', msg=>{
 	console.log("reconnect!");
 	console.log(msg);
-	saveToFileAsJSON("logs/reconnect.json", msg);
+	if (config.cheats.cacheCalls) {
+		saveToFileAsJSON("logs/reconnect.json", msg);
+	}
 });
 
 listener.on('disconnect', msg=>{
 	console.log("disconnect!");
 	console.log(msg);
-	saveToFileAsJSON("logs/disconnect.json", msg);
+	if (config.cheats.cacheCalls) {
+		saveToFileAsJSON("logs/disconnect.json", msg);
+	}
 });
 
 listener.on('error', (err)=>{
 	console.error(err);
-	saveToFileAsJSON("logs/error.json", err);
+	if (config.cheats.cacheCalls) {
+		saveToFileAsJSON("logs/error.json", err);
+	}
 });
 
 listener.on('heartbeat', (msg)=>{
 	console.log('Heartbeat signal. Thump thump!');
 	console.log(msg);
-	saveToFileAsJSON("logs/heartbeat.json", msg);
+	if (config.cheats.cacheCalls) {
+		saveToFileAsJSON("logs/heartbeat.json", msg);
+	}
 })
 
 
