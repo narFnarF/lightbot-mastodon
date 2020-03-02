@@ -51,10 +51,10 @@ listener.on('message', event => {
 			var args = commands;
 			callCommand(command, args, event);
 		}
-	} else if (event.event === 'update'){
+	} else if (event.event === 'update') {
 		console.log(`C'est un "${event.data.type}"`);
 		if (config.cheats.cacheCalls) {
-			saveToFileAsJSON("logs/updateEvent.json", msg);
+			saveToFileAsJSON("logs/updateEvent.json", event);
 		}
 	}
 });
