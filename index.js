@@ -53,9 +53,9 @@ listener.on('message', event => {
 		}
 	} else if (event.event === 'update') {
 		console.log(`C'est un "${event.data.type}"`);
-		if (config.cheats.cacheCalls) {
-			saveToFileAsJSON("logs/updateEvent.json", event);
-		}
+		// if (config.cheats.cacheCalls) { //désactivé pour par écrire le fichier des tonnes de fois
+		// 	saveToFileAsJSON("logs/updateEvent.json", event);
+		// }
 	}
 });
 
