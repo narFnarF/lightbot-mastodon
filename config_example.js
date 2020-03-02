@@ -16,7 +16,7 @@ module.exports = {
   },
 
   cheats: {
-    cacheCalls: true, //If true, will save the last replies from the Mastodon API in the logs folder.
-    useCachedMention: true, //Use the last mention from the debug cache
+    cacheCalls: false, //If true, will save the last replies from the Mastodon API in the logs folder.
+    useCachedMention: false, //Use the last mention from the debug cache
   },
 };
