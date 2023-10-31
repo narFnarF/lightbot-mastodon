@@ -3,7 +3,7 @@ A small game rewarding patience.
 
 *Take a deep breath and look into the lights.*
 
-# Repo migrated to https://codeberg.org/narF/Lightbot-discord
+# Repo migrated to https://codeberg.org/narF/lightbot-mastodon
 
 *Lightbot* is a **Mastodon bot** that generate images for you. Like a desk plant, your image is persistent and evolves over time.
 
